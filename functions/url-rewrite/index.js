@@ -4,6 +4,8 @@
 function handler(event) {
     var request = event.request;
     var originalImagePath = request.uri;
+    // handled space in the folder and image path    
+    originalImagePath = originalImagePath.split('%20').join('oo-shfws-22042024-oo');
     //  validate, process and normalize the requested operations in query parameters
     var normalizedOperations = {};
     if (request.querystring) {

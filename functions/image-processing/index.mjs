@@ -26,6 +26,9 @@ export const handler = async (event) => {
     let originalImageBody;
     let contentType;
     try {
+        // handled space in the folder and image path    
+        originalImagePath = originalImagePath.split('oo-shfws-22042024-oo').join(' ');
+
         const getOriginalImageCommand = new GetObjectCommand({ Bucket: S3_ORIGINAL_IMAGE_BUCKET, Key: originalImagePath });
         const getOriginalImageCommandOutput = await s3Client.send(getOriginalImageCommand);
         console.log(`Got response from S3 for ${originalImagePath}`);
@@ -33,6 +36,8 @@ export const handler = async (event) => {
         originalImageBody = getOriginalImageCommandOutput.Body.transformToByteArray();
         contentType = getOriginalImageCommandOutput.ContentType;
     } catch (error) {
+        console.log('Error downloading original image *****', {error: error.message, originalImagePath});
+
         return sendError(500, 'Error downloading original image', error);
     }
     let transformedImage = Sharp(await originalImageBody, { failOn: 'none', animated: true });
@@ -81,6 +86,9 @@ export const handler = async (event) => {
     if (S3_TRANSFORMED_IMAGE_BUCKET) {
         startTime = performance.now();
         try {
+            // handled space in the folder and image path    
+            originalImagePath = originalImagePath.split(' ').join('oo-shfws-22042024-oo');
+
             const putImageCommand = new PutObjectCommand({
                 Body: transformedImage,
                 Bucket: S3_TRANSFORMED_IMAGE_BUCKET,
